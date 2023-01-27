@@ -54,4 +54,10 @@ var routes = Routes{
 		"/contacts",
 		Contacts,
 	},
+	Route{
+		"MovieAdd",
+		"POST",
+		"/movie",
+		MovieAdd,
+	},
 }
