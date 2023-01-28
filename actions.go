@@ -7,7 +7,20 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2"
 )
+
+func getSession() *mgo.Session {
+	session, err := mgo.Dial("mongodb://localhost")
+
+	if err != nil {
+		panic(err)
+	}
+
+	return session
+}
+
+var collection = getSession().DB("go-study").C("movies")
 
 var movies = Movies{
 	Movie{"inception", 2010, "Nolan"},
@@ -46,5 +59,15 @@ func MovieAdd(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	log.Println(movie_data)
-	movies = append(movies, movie_data)
+
+	err = collection.Insert(movie_data)
+
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+
+	json.NewEncoder(w).Encode(movie_data)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
 }
